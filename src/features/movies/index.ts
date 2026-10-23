@@ -1,9 +1,12 @@
 // Public API of the movies feature. Screens import from here, not from internal paths.
 export { MovieCard } from './components/MovieCard';
 export { MovieRow } from './components/MovieRow';
+export { GenreTile } from './components/GenreTile';
 export { usePagedMovies } from './hooks/usePagedMovies';
 export { useGenres, useGenreImages } from './hooks/useGenres';
 export { pickTrailer } from './utils/trailer';
+export { SearchBar } from './components/SearchBar';
+export { GenreGrid } from './components/GenreGrid';
 export { useMovieSearch } from './hooks/useMovieSearch';
 export { useMovieDetails, releaseLabel } from './hooks/useMovieDetails';
 export { MovieCardSkeletons, MovieRowSkeletons, GenreTileSkeletons } from './components/MovieSkeletons';
