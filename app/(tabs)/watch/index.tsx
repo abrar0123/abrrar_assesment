@@ -83,6 +83,7 @@ export default function WatchScreen() {
     return (
       <FlatList
         key={`upcoming-${cardColumns}`} // numColumns can't change on the fly
+        testID="upcoming-list"
         data={upcoming.movies}
         numColumns={cardColumns}
         keyExtractor={(m) => String(m.id)}
