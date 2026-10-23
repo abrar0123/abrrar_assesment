@@ -2,7 +2,8 @@
 export { MovieCard } from './components/MovieCard';
 export { MovieRow } from './components/MovieRow';
 export { GenreTile } from './components/GenreTile';
-export { usePagedMovies } from './hooks/usePagedMovies';
+export { usePagedMovies, type LoadMoreState } from './hooks/usePagedMovies';
+export { LoadMoreFooter } from './components/LoadMoreFooter';
 export { useGenres, useGenreImages } from './hooks/useGenres';
 export { pickTrailer } from './utils/trailer';
 export { SearchBar } from './components/SearchBar';

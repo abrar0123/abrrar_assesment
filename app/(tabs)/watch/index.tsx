@@ -1,14 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Keyboard,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { FlatList, Keyboard, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -18,6 +9,7 @@ import { Genre, Movie, getUpcoming } from '@/src/api/tmdb';
 import { movieKeys, staleTimes } from '@/src/api/query';
 import {
   GenreGrid,
+  LoadMoreFooter,
   MovieCard,
   MovieCardSkeletons,
   MovieRow,
@@ -106,7 +98,7 @@ export default function WatchScreen() {
           )
         }
         ListFooterComponent={
-          upcoming.loadingMore ? <ActivityIndicator style={styles.footer} color={colors.accent} /> : null
+          <LoadMoreFooter state={upcoming.loadMoreState} onRetry={upcoming.retryLoadMore} />
         }
       />
     );
@@ -203,5 +195,4 @@ const styles = StyleSheet.create({
   cell: { flex: 1 },
   columnGap: { gap: spacing.screen },
   separator: { height: 20 },
-  footer: { marginTop: 20 },
 });
