@@ -53,6 +53,18 @@ So the app was built in a few **big steps** (one large prompt, then corrections 
 
 After that I read your brief ("the git history should show the app arriving in pieces… don't hide it") and asked Claude to check the repo against it. It told me plainly that this history didn't meet that point, and suggested writing this document instead of faking a step-by-step history (for example by backdating commits). I agreed.
 
+### Requirements check (later in Session 2)
+
+These commits were made one at a time and do show work arriving in pieces. I pasted the "requirements" slide and asked Claude to check the app against it, with offline-first as the priority. It read the config and code before changing anything:
+
+- **Stack & build:** already met (Expo SDK 55 / RN 0.83, TypeScript strict, New Architecture only, `targetSdk` 36, iOS 15.1, all orientations). No changes.
+- **Offline-first:** mostly met (persisted React Query cache, `offlineFirst` network mode, NetInfo, disk image cache, on-device bookings). It found two real gaps, fixed each test-first on its own branch, and committed the failing test before the fix:
+  - `feature/offline-pagination-footer`: when the next page was paused offline or failed, the list just stopped with a blank footer. It now says "You're offline. More movies will load when you reconnect." (and resumes on its own) or offers **Try again**.
+  - `fix/booking-storage-writes`: overlapping booking saves and cancels could overwrite each other and lose bookings (the new test reproduced it). Writes are now queued.
+- **States, responsive UI, tests:** every screen already had loading, empty and error states, plus a responsive layout and behaviour tests. Its new offline test first caused a React `act(...)` warning, which it fixed before committing.
+
+✍️ TODO: what I checked myself in this audit (for example, running it offline on a device).
+
 ---
 
 ## 4. Where I steered the model
@@ -75,6 +87,8 @@ These are the points in Session 1 where I changed what Claude was doing. Each ne
    ✍️ TODO: why.
 8. **Git history (Session 2)**: I asked for feature branches, chose `main` + `develop`, chose not to add AI co-author lines to commits, and then decided to document the rebuilt history openly rather than leave it unexplained.
    ✍️ TODO: anything to add.
+9. **Requirements check (Session 2)**: I asked for the app to be checked against the requirements slide, with offline-first first, rather than accepting the README's own claims.
+   ✍️ TODO: why.
 
 ✍️ TODO: any place where I knew Claude was wrong and overrode it (a bug, a bad library choice, a wrong API usage), even if it isn't obvious from my short messages.
 
@@ -89,4 +103,4 @@ The transcripts were exported from Claude Code's local session logs (`~/.claude/
 - **Shortened:** tool commands longer than 3,000 characters and tool outputs longer than 800 characters are cut off, marked `… [N more characters omitted]`.
 - **Images:** the screenshots I pasted are in [`images/`](images/) and linked where I sent them.
 - A third log file was an earlier copy of the start of Session 2 (the same conversation, resumed), so it isn't included separately.
-- Session 2 was exported while it was still running, so it ends just before this document was committed.
+- Session 2 was exported while it was still running, so it ends just before this document was first committed. The requirements check came after that export, so it isn't in the transcript yet.
