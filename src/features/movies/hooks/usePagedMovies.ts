@@ -2,6 +2,10 @@ import { useMemo } from 'react';
 import { QueryKey, useInfiniteQuery } from '@tanstack/react-query';
 import { Movie, Paged } from '@/src/api/tmdb';
 import { blockingMessage } from '@/src/api/query';
+import { useIsOnline } from '@/src/hooks/useIsOnline';
+
+// What the end of a loaded list should show.
+export type LoadMoreState = 'idle' | 'loading' | 'offline' | 'error';
 
 interface Options {
   queryKey: QueryKey;
@@ -21,6 +25,8 @@ export function usePagedMovies({ queryKey, fetchPage, staleTime, enabled = true 
     enabled,
   });
 
+  const online = useIsOnline();
+
   const movies = useMemo(() => {
     // TMDb occasionally repeats a movie across pages; keep list keys unique.
     const seen = new Set<number>();
@@ -33,12 +39,27 @@ export function usePagedMovies({ queryKey, fetchPage, staleTime, enabled = true 
     movies,
     total: query.data?.pages[0]?.total_results ?? 0,
     loading: query.isPending && enabled && query.fetchStatus !== 'paused',
-    loadingMore: query.isFetchingNextPage,
+    loadMoreState: loadMoreState(query, online),
     refreshing: query.isRefetching && !query.isFetchingNextPage,
     error: blockingMessage(query, movies.length > 0),
     loadMore: () => {
       if (query.hasNextPage && !query.isFetchingNextPage && !query.isError) query.fetchNextPage();
     },
+    retryLoadMore: () => query.fetchNextPage(),
     refresh: () => query.refetch(),
   };
+}
+
+interface PagedQueryLike {
+  isFetchingNextPage: boolean;
+  isFetchNextPageError: boolean;
+  hasNextPage: boolean;
+}
+
+// A paused or failed page request leaves isFetchingNextPage false, so say why the list stopped.
+function loadMoreState(query: PagedQueryLike, online: boolean): LoadMoreState {
+  if (query.isFetchingNextPage) return 'loading';
+  if (query.hasNextPage && !online) return 'offline';
+  if (query.isFetchNextPageError) return 'error';
+  return 'idle';
 }

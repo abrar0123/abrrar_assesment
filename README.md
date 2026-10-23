@@ -76,9 +76,9 @@ Confirmed bookings are saved on-device with AsyncStorage and listed on the **Das
 - Cached data is **always shown first**, then refreshed if stale: on mount, when the app returns to the foreground, and when the connection comes back.
 - The whole cache is **persisted to AsyncStorage for 7 days**, so a cold start offline still shows everything seen before. A cache buster invalidates it after breaking changes.
 - **Retries:** network and 5xx errors retry twice with backoff; 4xx errors (bad key, unknown movie) fail immediately.
-- **Offline:** requests pause instead of failing and resume on reconnect. An app-wide banner says "Offline · showing saved data". Screens with nothing saved explain that a connection is needed rather than looking empty.
+- **Offline:** requests pause instead of failing and resume on reconnect. An app-wide banner says "Offline · showing saved data". Screens with nothing saved explain that a connection is needed rather than looking empty. Infinite lists that reach the end of what's cached say so ("More movies will load when you reconnect") and continue on their own. A failed page shows **Try again** without hiding what's already loaded.
 - **Images** use `expo-image` with a memory + disk cache.
-- **Bookings** are local data in AsyncStorage and are fully available offline.
+- **Bookings** are local data in AsyncStorage and are fully available offline. Changes are queued so overlapping saves and cancels can't overwrite each other.
 
 ### Why these libraries
 

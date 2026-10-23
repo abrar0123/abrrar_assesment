@@ -1,4 +1,4 @@
-import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
+import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 import TabLayout from '@/app/(tabs)/_layout';
 import WatchLayout from '@/app/(tabs)/watch/_layout';
 import WatchScreen from '@/app/(tabs)/watch/index';
@@ -64,6 +64,54 @@ describe('Watch screen', () => {
 
     expect(await screen.findByText('Saved Movie')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
+
+  describe('loading more at the end of the list', () => {
+    beforeEach(() => {
+      server.on('/movie/upcoming', (params) =>
+        params.get('page') === '2'
+          ? page([movie(5, 'Second Page Movie')], 2, 2)
+          : page([movie(1, 'Hope')], 1, 2),
+      );
+    });
+
+    it('says why the list stopped while offline, then continues on reconnect', async () => {
+      // Retries on, like the app: an offline page request pauses instead of failing.
+      renderWatch(createTestQueryClient({ retry: 1 }));
+      await screen.findByText('Hope');
+
+      act(() => setOnline(false));
+      server.setOffline(true);
+      fireEvent(screen.getByTestId('upcoming-list'), 'endReached');
+
+      expect(
+        await screen.findByText(/you're offline\. more movies will load when you reconnect/i),
+      ).toBeVisible();
+
+      server.setOffline(false);
+      act(() => setOnline(true));
+
+      expect(await screen.findByText('Second Page Movie')).toBeVisible();
+      expect(screen.queryByText(/you're offline/i)).toBeNull();
+    });
+
+    it('offers a retry when the next page fails, keeping what is already shown', async () => {
+      renderWatch();
+      await screen.findByText('Hope');
+
+      server.on('/movie/upcoming', () => {
+        throw Object.assign(new Error('TMDb is down'), { status: 500 });
+      });
+      fireEvent(screen.getByTestId('upcoming-list'), 'endReached');
+
+      expect(await screen.findByText("Couldn't load more movies.")).toBeVisible();
+      expect(screen.getByText('Hope')).toBeVisible();
+
+      server.on('/movie/upcoming', () => page([movie(5, 'Second Page Movie')], 2, 2));
+      fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+
+      expect(await screen.findByText('Second Page Movie')).toBeVisible();
+    });
   });
 
   it('opens search with a genre grid, then shows top results for what the user types', async () => {

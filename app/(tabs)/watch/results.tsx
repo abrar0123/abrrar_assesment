@@ -1,10 +1,16 @@
 import React, { useCallback } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Movie, discoverByGenre, searchMovies } from '@/src/api/tmdb';
 import { movieKeys, staleTimes } from '@/src/api/query';
-import { MovieRow, MovieRowSkeletons, useGenres, usePagedMovies } from '@/src/features/movies';
+import {
+  LoadMoreFooter,
+  MovieRow,
+  MovieRowSkeletons,
+  useGenres,
+  usePagedMovies,
+} from '@/src/features/movies';
 import { ScreenHeader } from '@/src/components/ScreenHeader';
 import { EmptyView, ErrorView } from '@/src/components/StatusViews';
 import { useResponsive } from '@/src/hooks/useResponsive';
@@ -74,9 +80,7 @@ export default function ResultsScreen() {
               />
             )
           }
-          ListFooterComponent={
-            list.loadingMore ? <ActivityIndicator style={styles.footer} color={colors.accent} /> : null
-          }
+          ListFooterComponent={<LoadMoreFooter state={list.loadMoreState} onRetry={list.retryLoadMore} />}
         />
       )}
     </View>
@@ -88,5 +92,4 @@ const styles = StyleSheet.create({
   list: { padding: spacing.screen, flexGrow: 1 },
   cell: { flex: 1 },
   columnGap: { gap: spacing.screen },
-  footer: { marginTop: 20 },
 });
