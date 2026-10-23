@@ -18,20 +18,20 @@ I used Claude Code **with its default setup**. There was no `CLAUDE.md`, no `.cu
 
 I started from an existing Expo project of mine that had older screens (items/owners, Supabase, Tailwind). This is the real order of what happened:
 
-| Time (PKT) | What I asked for / what happened |
-| --- | --- |
-| 18:13 | Make the app open straight into the tab screens. |
-| 19:23 | Pasted the three design and brief screenshots and asked for the movie app as specified. Claude built the Watch tab, search, movie details, trailer and seat booking. |
-| 19:45 | Stopped Claude while it was waiting on the simulator, and gave it my TMDb key (redacted in the logs). |
-| 20:28 | **Commit:** "Build TMDb movie app with search, trailer and seat booking" |
-| 20:51 | Pasted a screenshot and told it the screen had to match the design exactly. |
-| 20:55 | Asked for confirmed bookings to be saved in AsyncStorage and shown on the Dashboard, which was empty. |
-| 21:04 | Asked for debounced search. |
-| 21:24 | **Commit:** "Debounce movie search and cancel stale requests" |
-| 21:24 | Asked for a clean, senior-level structure and best practices. Claude moved the code into `src/features/*`, removed the old Supabase/Tailwind code, and added tests and tooling. |
-| 21:44 | **Commit:** "Refactor into feature-based structure with tests and tooling" |
-| 21:52 | Pasted the requirements list and asked for each item to be implemented one by one. Claude also removed `ios/` and the Firebase config files from git. |
-| 23:13 | Pasted the theory questions and asked for answers. Claude's response was stopped by a safety filter. |
+| Time (PKT) | What I asked for / what happened                                                                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 18:13      | Make the app open straight into the tab screens.                                                                                                                                |
+| 19:23      | Pasted the three design and brief screenshots and asked for the movie app as specified. Claude built the Watch tab, search, movie details, trailer and seat booking.            |
+| 19:45      | Stopped Claude while it was waiting on the simulator, and gave it my TMDb key (redacted in the logs).                                                                           |
+| 20:28      | **Commit:** "Build TMDb movie app with search, trailer and seat booking"                                                                                                        |
+| 20:51      | Pasted a screenshot and told it the screen had to match the design exactly.                                                                                                     |
+| 20:55      | Asked for confirmed bookings to be saved in AsyncStorage and shown on the Dashboard, which was empty.                                                                           |
+| 21:04      | Asked for debounced search.                                                                                                                                                     |
+| 21:24      | **Commit:** "Debounce movie search and cancel stale requests"                                                                                                                   |
+| 21:24      | Asked for a clean, senior-level structure and best practices. Claude moved the code into `src/features/*`, removed the old Supabase/Tailwind code, and added tests and tooling. |
+| 21:44      | **Commit:** "Refactor into feature-based structure with tests and tooling"                                                                                                      |
+| 21:52      | Pasted the requirements list and asked for each item to be implemented one by one. Claude also removed `ios/` and the Firebase config files from git.                           |
+| 23:13      | Pasted the theory questions and asked for answers. Claude's response was stopped by a safety filter.                                                                            |
 
 So the app was built in a few **big steps** (one large prompt, then corrections and additions), not in small slices.
 
