@@ -34,6 +34,19 @@ describe('bookingStorage', () => {
     expect(await bookedSeatIds('42', '2026-10-22', 'h1')).toEqual(new Set(['5-6']));
   });
 
+  it('keeps every booking when saves and cancels overlap', async () => {
+    const kept = await addBooking({ ...input, title: 'Kept' });
+    const doomed = await addBooking({ ...input, title: 'Doomed' });
+
+    await Promise.all([
+      addBooking({ ...input, title: 'A' }),
+      addBooking({ ...input, title: 'B' }),
+      cancelBooking(doomed.id),
+    ]);
+
+    expect((await getBookings()).map((b) => b.title).sort()).toEqual(['A', 'B', kept.title]);
+  });
+
   it('treats corrupt storage as empty instead of crashing', async () => {
     await AsyncStorage.setItem('bookings:v1', '{not json');
     expect(await getBookings()).toEqual([]);
