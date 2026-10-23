@@ -1,0 +1,8 @@
+ios
+android
+node_modules
+.expo
+.metro-cache
+coverage
+yarn.lock
+ANSWERS.md
