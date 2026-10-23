@@ -2,8 +2,6 @@
 
 I built this app with **Claude Code** (the desktop app, model `claude-opus-5-5`). This page explains how the app and its git history were actually made. Nothing is hidden. The full session logs are in [`transcripts/`](transcripts/).
 
-> ✍️ Lines marked **✍️ TODO** are where I still need to add my own explanation.
-
 ---
 
 ## 1. Agent setup
@@ -35,7 +33,7 @@ I started from an existing Expo project of mine that had older screens (items/ow
 
 So the app was built in a few **big steps** (one large prompt, then corrections and additions), not in small slices.
 
-✍️ TODO: who wrote `ANSWERS.md` and how (for example: written by me, or drafted with AI and edited by me).
+`ANSWERS.md` (the theory questions) I wrote fully myself, from my own project experience.
 
 ---
 
@@ -45,8 +43,7 @@ So the app was built in a few **big steps** (one large prompt, then corrections 
 
 **The branch history you see in this repo was rebuilt after the app was finished. It is not the order the app was written in.**
 
-- Session 1 made real commits (listed above). The `.git` folder holding them was gone by the time Session 2 started, so those commits are lost.
-  ✍️ TODO: why the original `.git` folder was removed.
+- Session 1 made real commits (listed above). The `.git` folder holding them was gone by the time Session 2 started, so those commits are lost. I removed it on purpose: that history came from my earlier project and had Supabase and Firebase files and keys in it, and I didn't want those secrets in a repo I'm sharing.
 - On **23 Oct 2026 at ~16:35 PKT** I asked Claude Code to put the finished code into a fresh repo with feature branches. It split the final files into 12 branches (setup, 10 features, docs) and merged them into `develop` with `--no-ff`, then into `main` as `v1.0.0`.
 - All of those commits were created **within about 5 seconds** (16:35:20–16:35:25), as the commit timestamps show. Every commit contains final code. For example, the `feature/design-system` commit already has the folder structure that really only came from the 21:24 refactor.
 - Claude checked that the final tree matched my working copy exactly and that `tsc` and all 44 Jest tests passed. It did not check that each intermediate commit builds on its own.
@@ -63,34 +60,24 @@ These commits were made one at a time and do show work arriving in pieces. I pas
   - `fix/booking-storage-writes`: overlapping booking saves and cancels could overwrite each other and lose bookings (the new test reproduced it). Writes are now queued.
 - **States, responsive UI, tests:** every screen already had loading, empty and error states, plus a responsive layout and behaviour tests. Its new offline test first caused a React `act(...)` warning, which it fixed before committing.
 
-✍️ TODO: what I checked myself in this audit (for example, running it offline on a device).
+The fixes were checked by `tsc`, ESLint and the Jest suite (47 tests). They have not yet been tried on a real device.
 
 ---
 
 ## 4. Where I steered the model
 
-These are the points in Session 1 where I changed what Claude was doing. Each needs **why** in my own words.
+These are the points where I changed what Claude was doing, taken from my messages in the transcripts. I've recorded what I did. Where I haven't written a reason, I've left it out rather than make one up afterwards.
 
-1. **Design screenshots (19:23)**: gave Claude the design and brief instead of letting it guess the UI.
-   ✍️ TODO: why.
-2. **"This screen should be the same as this" (20:51)**: the screen Claude built didn't match the design, so I sent a screenshot and asked for it to match exactly.
-   ✍️ TODO: what was wrong and why it mattered.
-3. **Bookings in AsyncStorage, shown on the Dashboard (20:55)**: the Dashboard was empty after booking.
-   ✍️ TODO: why AsyncStorage, and what was missing.
-4. **Debounced search (21:04)**: search ran on every keystroke.
-   ✍️ TODO: why.
-5. **Clean-code / senior-level refactor (21:24)**: Claude's first version worked but wasn't structured the way I wanted.
-   ✍️ TODO: what I didn't like about the first structure.
-6. **Requirements one by one (21:52)**: I made Claude go through the requirements list item by item instead of in one pass.
-   ✍️ TODO: why.
-7. **Stopping it at 19:45**: Claude was waiting on the simulator, so I interrupted it.
-   ✍️ TODO: why.
+1. **Design screenshots (19:23)**: I gave Claude the design and brief screenshots so it built the screens from them.
+2. **"This screen should be the same as this" (20:51)**: I sent a design screenshot and told Claude to look very carefully and make its screen match it.
+3. **Bookings in AsyncStorage, shown on the Dashboard (20:55)**: the Dashboard was empty, so I asked for confirmed bookings to be saved with AsyncStorage and listed there.
+4. **Debounced search (21:04)**: I asked for debouncing on search.
+5. **Clean-code / senior-level refactor (21:24)**: I asked for clean code, best practices and a proper folder structure, and Claude reorganised the code into feature modules.
+6. **Requirements one by one (21:52)**: I pasted the requirements list and told Claude to implement every item, one by one.
+7. **Stopping it at 19:45**: I interrupted Claude while it was waiting for the simulator, and gave it the TMDb key.
 8. **Git history (Session 2)**: I asked for feature branches, chose `main` + `develop`, chose not to add AI co-author lines to commits, and then decided to document the rebuilt history openly rather than leave it unexplained.
-   ✍️ TODO: anything to add.
-9. **Requirements check (Session 2)**: I asked for the app to be checked against the requirements slide, with offline-first first, rather than accepting the README's own claims.
-   ✍️ TODO: why.
-
-✍️ TODO: any place where I knew Claude was wrong and overrode it (a bug, a bad library choice, a wrong API usage), even if it isn't obvious from my short messages.
+9. **Requirements check (Session 2)**: I asked for the app to be checked against the requirements slide, with offline-first as the priority.
+10. **Asking the AI to write my reasons (Session 2)**: I asked Claude to fill in this section for me, written as if by a human. It refused to make up my reasons and asked me multiple-choice questions instead. The two reasons above (the `.git` folder and `ANSWERS.md`) are my answers. I left the rest as facts only.
 
 ---
 
