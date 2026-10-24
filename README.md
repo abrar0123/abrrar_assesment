@@ -147,6 +147,11 @@ tests/                            screen-level behaviour tests (outside app/ so 
 - **Abortable requests** — React Query passes an `AbortSignal` to every request, so stale responses (e.g. older search queries) are cancelled.
 - **Secrets** stay in `.env` (git-ignored); `.env.example` documents the variables.
 
+## Further reading
+
+- [DECISIONS.md](DECISIONS.md): architecture decisions and trade-offs, with what each one costs.
+- [AI_USAGE.md](AI_USAGE.md): how I used Claude Code, where I steered or corrected it, and how to read the git history.
+
 ## Demo videos (previous submission)
 
 - App Demo: https://www.loom.com/share/97fb6ee1cd5c4b5da3286095c6e927f9
