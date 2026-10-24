@@ -2,6 +2,7 @@ import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testi
 import TabLayout from '@/app/(tabs)/_layout';
 import WatchLayout from '@/app/(tabs)/watch/_layout';
 import WatchScreen from '@/app/(tabs)/watch/index';
+import ResultsScreen from '@/app/(tabs)/watch/results';
 import { movieKeys } from '@/src/api/query';
 import { createTmdbServer, movie, page } from '@/src/test/tmdbServer';
 import { createTestQueryClient, createWrapper, setOnline } from '@/src/test/render';
@@ -11,13 +12,14 @@ const routes = {
   '(tabs)/_layout': TabLayout,
   '(tabs)/watch/_layout': WatchLayout,
   '(tabs)/watch/index': WatchScreen,
+  '(tabs)/watch/results': ResultsScreen,
   '(tabs)/dashboard': () => null,
   '(tabs)/media-library': () => null,
   '(tabs)/more': () => null,
 };
 
-const renderWatch = (client = createTestQueryClient()) =>
-  renderRouter(routes, { initialUrl: '/watch', wrapper: createWrapper(client) });
+const renderWatch = (client = createTestQueryClient(), initialUrl = '/watch') =>
+  renderRouter(routes, { initialUrl, wrapper: createWrapper(client) });
 
 beforeEach(() => {
   server.install();
@@ -64,6 +66,36 @@ describe('Watch screen', () => {
 
     expect(await screen.findByText('Saved Movie')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
+
+  describe('opening a screen offline with nothing saved', () => {
+    const actionMovies = '/watch/results?genreId=28&genreName=Action';
+
+    beforeEach(() => {
+      // On a real phone with no signal, requests hang instead of failing straight away.
+      act(() => setOnline(false));
+      server.setStalled(true);
+    });
+
+    it('says it is offline instead of showing skeletons forever', async () => {
+      renderWatch(createTestQueryClient({ retry: 1 }), actionMovies);
+
+      expect(await screen.findByText(/you're offline/i)).toBeVisible();
+      expect(screen.queryByText('Loading…')).toBeNull();
+      expect(screen.queryByText(/0 results found/i)).toBeNull();
+    });
+
+    it('loads the movies as soon as the connection comes back', async () => {
+      renderWatch(createTestQueryClient({ retry: 1 }), actionMovies);
+      await screen.findByText(/you're offline/i);
+
+      // The first request is still hanging; coming back online must not wait for it to time out.
+      server.setStalled(false);
+      act(() => setOnline(true));
+
+      expect(await screen.findByText('Cover')).toBeVisible();
+      expect(screen.getByText('1 Result Found')).toBeVisible();
+    });
   });
 
   describe('loading more at the end of the list', () => {

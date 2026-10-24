@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { QueryKey, useInfiniteQuery } from '@tanstack/react-query';
 import { Movie, Paged } from '@/src/api/tmdb';
-import { blockingMessage } from '@/src/api/query';
+import { useScreenState } from '@/src/api/query';
 import { useIsOnline } from '@/src/hooks/useIsOnline';
 
 // What the end of a loaded list should show.
@@ -34,14 +34,15 @@ export function usePagedMovies({ queryKey, fetchPage, staleTime, enabled = true 
       .flatMap((p) => p.results)
       .filter((m) => !seen.has(m.id) && !!seen.add(m.id));
   }, [query.data]);
+  const screen = useScreenState(query, movies.length > 0);
 
   return {
     movies,
     total: query.data?.pages[0]?.total_results ?? 0,
-    loading: query.isPending && enabled && query.fetchStatus !== 'paused',
+    loading: enabled && screen.loading,
     loadMoreState: loadMoreState(query, online),
     refreshing: query.isRefetching && !query.isFetchingNextPage,
-    error: blockingMessage(query, movies.length > 0),
+    error: enabled ? screen.error : null,
     loadMore: () => {
       if (query.hasNextPage && !query.isFetchingNextPage && !query.isError) query.fetchNextPage();
     },
