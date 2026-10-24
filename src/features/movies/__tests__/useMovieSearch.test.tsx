@@ -9,7 +9,7 @@ beforeEach(() => {
   jest.useFakeTimers();
   server.install();
   server.reset();
-  setOnline(true);
+  act(() => setOnline(true));
   server.on('/search/movie', (params) =>
     page([movie(1, `${params.get('query')} One`), movie(2, `${params.get('query')} Two`)]),
   );
@@ -69,7 +69,7 @@ describe('useMovieSearch', () => {
     act(() => jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS));
     await waitFor(() => expect(result.current.results).toHaveLength(2));
 
-    setOnline(false);
+    act(() => setOnline(false));
     server.setOffline(true);
 
     act(() => result.current.setQuery('Never searched'));
@@ -90,7 +90,7 @@ describe('useMovieSearch', () => {
     act(() => jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS));
     await waitFor(() => expect(result.current.results).toHaveLength(2));
 
-    setOnline(false);
+    act(() => setOnline(false));
     server.setOffline(true);
     act(() => result.current.setQuery('Arrival'));
     act(() => jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS + 100));
@@ -100,7 +100,7 @@ describe('useMovieSearch', () => {
 
     // Back online: the paused search resumes by itself.
     server.setOffline(false);
-    setOnline(true);
+    act(() => setOnline(true));
     await waitFor(() => expect(result.current.results[0]?.title).toBe('Arrival One'));
     expect(result.current.error).toBeNull();
   });

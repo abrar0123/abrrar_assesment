@@ -45,9 +45,9 @@ export default function ResultsScreen() {
   const openMovie = useCallback((m: Movie) => router.push(`/movie/${m.id}`), [router]);
 
   const loadingTitle = genreName ? 'Loading…' : 'Searching…';
-  const title = list.loading
-    ? loadingTitle
-    : `${list.total.toLocaleString()} ${list.total === 1 ? 'Result' : 'Results'} Found`;
+  // Without results we can't count them, so don't claim "0 Results Found".
+  const countTitle = `${list.total.toLocaleString()} ${list.total === 1 ? 'Result' : 'Results'} Found`;
+  const title = list.loading ? loadingTitle : list.error ? 'Results' : countTitle;
 
   return (
     <View style={styles.container}>
