@@ -41,7 +41,7 @@ From the requirements audit onwards, every fix has the failing test committed be
 
 ## Agent setup and planning notes
 
-- **Agent setup:** none for this build. I used Claude Code with its default settings, and no `CLAUDE.md`, rules or prompt templates.
+- **Agent setup:** none for this build. I used Claude Code with its default settings, and no `CLAUDE.md`, rules or prompt templates. Afterwards I wrote [`CLAUDE.md`](CLAUDE.md) as a reusable setup for my future React Native projects. It captures what this project taught me: test-first fixes, the offline-first checklist, branch and commit rules.
 - **Planning notes:** this build was driven by chat prompts. My spec was the brief and the design screenshots, and I don't have separate written plans to include.
 
 ## What I wrote myself
