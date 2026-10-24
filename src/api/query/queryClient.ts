@@ -52,6 +52,27 @@ export const queryPersister = createAsyncStoragePersister({
 // Bump to discard persisted caches after a breaking change to the cached data's shape.
 export const CACHE_BUSTER = 'tmdb-v1';
 
+// A request sent with no signal can keep hanging after the connection returns, and React Query's
+// reconnect refetch joins it instead of replacing it (cancelRefetch only applies once a query
+// has data). Cancel and restart those, only for screens with nothing to show yet, so content
+// appears as soon as we're back online.
+export function restartStuckQueriesOnReconnect(client: QueryClient) {
+  let wasOnline = onlineManager.isOnline();
+  return onlineManager.subscribe((online) => {
+    if (online && !wasOnline) {
+      const stuck = client
+        .getQueryCache()
+        .findAll({ type: 'active' })
+        .filter((q) => q.state.data === undefined && q.state.fetchStatus === 'fetching');
+      if (stuck.length > 0) {
+        const filters = { predicate: (q: (typeof stuck)[number]) => stuck.includes(q) };
+        client.cancelQueries(filters).then(() => client.refetchQueries(filters));
+      }
+    }
+    wasOnline = online;
+  });
+}
+
 let listenersRegistered = false;
 
 // Teach React Query about React Native's connectivity and app lifecycle (it assumes a browser).

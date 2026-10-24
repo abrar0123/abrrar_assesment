@@ -1,13 +1,14 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { Genre, discoverByGenre, getGenres } from '@/src/api/tmdb';
-import { blockingMessage, movieKeys, staleTimes } from '@/src/api/query';
+import { movieKeys, staleTimes, useScreenState } from '@/src/api/query';
 
 export function useGenres() {
   const query = useQuery({ queryKey: movieKeys.genres(), queryFn: getGenres, staleTime: staleTimes.genres });
+  const { loading, error } = useScreenState(query, !!query.data);
   return {
     genres: query.data ?? [],
-    loading: query.isPending && query.fetchStatus !== 'paused',
-    error: blockingMessage(query, !!query.data),
+    loading,
+    error,
     retry: () => query.refetch(),
   };
 }

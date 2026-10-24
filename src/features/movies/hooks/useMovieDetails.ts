@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMovie, getMovieImages, getMovieVideos } from '@/src/api/tmdb';
-import { blockingMessage, movieKeys, staleTimes } from '@/src/api/query';
+import { movieKeys, staleTimes, useScreenState } from '@/src/api/query';
 import { formatLongDate, parseDate } from '@/src/utils/dates';
 import { pickTrailer } from '../utils/trailer';
 
@@ -25,13 +25,14 @@ export function useMovieDetails(id: string) {
     queryFn: () => fetchMovieDetails(id),
     staleTime: staleTimes.movie,
   });
+  const { loading, error } = useScreenState(query, !!query.data);
 
   return {
     data: query.data
       ? { ...query.data, releaseLabel: releaseLabel(query.data.movie.release_date) }
       : undefined,
-    loading: query.isPending && query.fetchStatus !== 'paused',
-    error: blockingMessage(query, !!query.data),
+    loading,
+    error,
     retry: () => query.refetch(),
   };
 }

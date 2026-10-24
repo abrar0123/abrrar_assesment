@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import {
   CACHE_BUSTER,
@@ -6,6 +6,7 @@ import {
   createQueryClient,
   queryPersister,
   registerQueryListeners,
+  restartStuckQueriesOnReconnect,
 } from './queryClient';
 
 registerQueryListeners();
@@ -13,6 +14,7 @@ registerQueryListeners();
 // Query cache restored from disk on launch, so previously seen screens render offline.
 export function QueryProvider({ children }: { children: ReactNode }) {
   const [client] = useState(createQueryClient);
+  useEffect(() => restartStuckQueriesOnReconnect(client), [client]);
 
   return (
     <PersistQueryClientProvider

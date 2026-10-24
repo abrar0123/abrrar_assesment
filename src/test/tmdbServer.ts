@@ -6,6 +6,7 @@ type Handler = (params: URLSearchParams) => unknown;
 export function createTmdbServer() {
   const routes = new Map<string, Handler>();
   let offline = false;
+  let stalled = false;
   const requests: { path: string; params: URLSearchParams }[] = [];
 
   const fetchMock = jest.fn(async (input: string, init?: { signal?: AbortSignal }) => {
@@ -14,6 +15,12 @@ export function createTmdbServer() {
     requests.push({ path, params: url.searchParams });
     if (init?.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
     if (offline) throw new TypeError('Network request failed');
+    if (stalled) {
+      // Like a phone with no signal: the request hangs until it is aborted.
+      return new Promise<never>((_, reject) =>
+        init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))),
+      );
+    }
     const handler = routes.get(path);
     if (!handler) {
       return { ok: false, status: 404, json: async () => ({ status_message: `No route for ${path}` }) };
@@ -32,11 +39,15 @@ export function createTmdbServer() {
     setOffline: (value: boolean) => {
       offline = value;
     },
+    setStalled: (value: boolean) => {
+      stalled = value;
+    },
     requestsTo: (path: string) => requests.filter((r) => r.path === path),
     reset: () => {
       routes.clear();
       requests.length = 0;
       offline = false;
+      stalled = false;
       fetchMock.mockClear();
     },
     install: () => {
