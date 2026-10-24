@@ -1,6 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, onlineManager } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { restartStuckQueriesOnReconnect } from '@/src/api/query';
 
 // Same defaults as the app, minus retries/backoff so failures surface immediately in tests.
 export function createTestQueryClient({ retry = false }: { retry?: boolean | number } = {}) {
@@ -18,6 +19,7 @@ const safeAreaMetrics = {
 
 export function createWrapper(client = createTestQueryClient()) {
   function Wrapper({ children }: { children: ReactNode }) {
+    useEffect(() => restartStuckQueriesOnReconnect(client), []); // as QueryProvider does in the app
     return (
       <SafeAreaProvider initialMetrics={safeAreaMetrics}>
         <QueryClientProvider client={client}>{children}</QueryClientProvider>
