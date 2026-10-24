@@ -84,6 +84,18 @@ describe('Watch screen', () => {
       expect(screen.queryByText('Loading…')).toBeNull();
       expect(screen.queryByText(/0 results found/i)).toBeNull();
     });
+
+    it('loads the movies as soon as the connection comes back', async () => {
+      renderWatch(createTestQueryClient({ retry: 1 }), actionMovies);
+      await screen.findByText(/you're offline/i);
+
+      // The first request is still hanging; coming back online must not wait for it to time out.
+      server.setStalled(false);
+      act(() => setOnline(true));
+
+      expect(await screen.findByText('Cover')).toBeVisible();
+      expect(screen.getByText('1 Result Found')).toBeVisible();
+    });
   });
 
   describe('loading more at the end of the list', () => {
