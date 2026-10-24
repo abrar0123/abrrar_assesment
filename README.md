@@ -147,10 +147,6 @@ tests/                            screen-level behaviour tests (outside app/ so 
 - **Abortable requests** — React Query passes an `AbortSignal` to every request, so stale responses (e.g. older search queries) are cancelled.
 - **Secrets** stay in `.env` (git-ignored); `.env.example` documents the variables.
 
-## How AI was used
-
-Built with Claude Code. See [`docs/ai/AI_WORKFLOW.md`](docs/ai/AI_WORKFLOW.md) for how the app and its git history were made, where I steered the model, and the full session transcripts.
-
 ## Demo videos (previous submission)
 
 - App Demo: https://www.loom.com/share/97fb6ee1cd5c4b5da3286095c6e927f9
